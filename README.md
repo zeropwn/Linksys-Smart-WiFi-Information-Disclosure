@@ -3,7 +3,10 @@
 * Target: Various Linksys routers
 * http://www.linksys.com/us/support-article?articleNum=156266
 
-On the Linux EA8500 series router there are a number of administrative actions that require very little authentication. This tool can be used to extract as much sensitive data from the Router as possible (without having to login). Here is a list of unlocked methods:
+![nss.py](http://i.imgur.com/cmEKwlO.png)
+
+
+On the Linux EA8500 series router and others there are a number of administrative actions that require very little authentication. This tool can be used to extract as much sensitive data from the Router as possible (without having to login). Here is a list of unlocked methods:
 ```python
 		'GetOwnedNetworkID': 'http://linksys.com/jnap/ownednetwork/GetOwnedNetworkID',
 		'IsAdminPasswordDefault': 'http://cisco.com/jnap/core/IsAdminPasswordDefault',
@@ -34,8 +37,6 @@ On the Linux EA8500 series router there are a number of administrative actions t
 		'GetWPSServerSettings': 'http://linksys.com/jnap/wirelessap/GetWPSServerSettings',
 		'GetWANStatus3': 'http://linksys.com/jnap/router/GetWANStatus3'
 ```
-
-![nss.py](http://i.imgur.com/cmEKwlO.png)
 
 
 # Installation
