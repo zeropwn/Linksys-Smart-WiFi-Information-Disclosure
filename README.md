@@ -41,8 +41,8 @@ On the Linux EA8500 series router and others there are a number of administrativ
 
 # Installation
 ```bash
-git clone https://github.com/zeropwn/Linksys-EA8500-Information-Disclosure
-cd Linksys-EA8500-Information-Disclosure
+git clone https://github.com/zeropwn/Linksys-Smart-WiFi-Information-Disclosure
+cd Linksys-Smart-WiFi-Information-Disclosure
 chmod +x nss.py
 ```
 
