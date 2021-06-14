@@ -10,6 +10,7 @@
 from pprint import pprint
 import requests
 from cmd import Cmd
+import json
 
 class notsosmartwifi():
 	# fingerprinting methods
@@ -52,6 +53,75 @@ class notsosmartwifi():
 			r[action] = requests.post('http://{0}/JNAP/'.format(target), headers=header, data="{}").text
 		return r
 
+	def print_devices(self, target):
+		r = {}
+		header = {'X-JNAP-Action': '{0}'.format(self.methods['GetDevices'])}
+		print('Grabbing data from {0}...'.format('GetDevices'))
+		res = requests.post('http://{0}/JNAP/'.format(target), headers=header, data="{}").text
+
+		rjson = json.loads(res)
+
+		i=0
+#		pprint(rjson)
+
+		for entry in rjson['output']['devices']:
+			print(entry)
+			retval = {}
+
+			if (len(entry['connections'])==0):
+				hascxn = 0
+			else:
+				hascxn = 1
+
+			if (hascxn):
+				retval['ipAddress'] = entry['connections'][0]['ipAddress']
+			else:
+				retval['ipAddress'] = '<no ip given>'
+			
+			#retval['expiration'] = entry['expiration']
+
+			if ('friendlyName' in entry):
+				retval['ident'] = entry['friendlyName']
+			else:
+				if (hascxn):
+					retval['ident'] = entry['connections'][0]['macAddress']
+				else:
+					retval['ident'] = entry['deviceID']
+
+			if (entry['model']['deviceType'] != ''):
+				retval['ident'] = retval['ident'] + " (" + entry['model']['deviceType'] + ")"
+
+			i=i+1
+			r[i]=retval
+
+		r = dict(sorted(r.items(), key=lambda item: item[1]['ipAddress']))
+
+		return r
+
+	def print_leases(self, target):
+		r = {}
+		header = {'X-JNAP-Action': '{0}'.format(self.methods['GetDHCPClientLeases'])}
+		print('Grabbing data from {0}...'.format('GetDHCPClientLeases'))
+		res = requests.post('http://{0}/JNAP/'.format(target), headers=header, data="{}").text
+
+		rjson = json.loads(res)
+
+		i=0
+		for entry in rjson['output']['leases']:
+			retval = {}
+			retval['ipAddress'] = entry['ipAddress']
+			retval['expiration'] = entry['expiration']
+			if ('hostName' in entry):
+				retval['ident'] = entry['hostName']
+			else:
+				retval['ident'] = entry['macAddress']
+			i=i+1
+			r[i]=retval
+
+		r = dict(sorted(r.items(), key=lambda item: item[1]['expiration'], reverse=True))
+
+		return r
+
 class ui(Cmd):
 	red = '\033[31m'
 	green = '\033[32m'
@@ -86,6 +156,17 @@ class ui(Cmd):
 			print(self.bold,self.green,result,self.end)
 			pprint(v)
 			print("\n\n")
+
+	def do_leases(self,target):
+		results = self.nss.print_leases(target)
+		for result,v in results.items():
+			print(self.bold,self.green,v['ipAddress']+" ["+v['ident']+"]",self.end)
+
+	def do_devices(self,target):
+		results = self.nss.print_devices(target)
+		for result,v in results.items():
+			print(self.bold,self.green,v['ipAddress']+" ["+v['ident']+"]",self.end)
+
 	def do_exit(self, void):
 		return True
 
